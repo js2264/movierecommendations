@@ -1,6 +1,8 @@
 # movierecommendations
 
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![pkgdown](https://github.com/js2264/movierecommendations/workflows/pkgdown/badge.svg)](https://github.com/js2264/movierecommendations/actions)
 <!-- badges: end -->
 
 The goal of movierecommendations is to ...

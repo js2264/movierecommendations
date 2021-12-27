@@ -16,6 +16,39 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/co_occurrences.html</loc>
+  </url>
+  <url>
+    <loc>/reference/enrichRecommendation.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fetchMovieByID.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getRecommendations.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_TMDB.html</loc>
+  </url>
+  <url>
+    <loc>/reference/id2title.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reexports.html</loc>
+  </url>
+  <url>
+    <loc>/reference/searchMovie.html</loc>
+  </url>
+  <url>
+    <loc>/reference/searchTitle.html</loc>
+  </url>
+  <url>
+    <loc>/reference/title2id.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tmdb.html</loc>
   </url>
 </urlset>

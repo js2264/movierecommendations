@@ -24,4 +24,16 @@ co_occurrences <- function() {
     return(co_occurrences)
 }
 
+co_occurrencesGraph <- function(co_occurrences, tmdb) {
+    nodes <- tibble::tibble(name = unique(c(co_occurrences$from, co_occurrences$to))) |>
+        dplyr::left_join(tmdb$movies, by = c('name' = 'title'))
+    edges <- tibble::tibble(from = co_occurrences$from, to = co_occurrences$to, weight = co_occurrences$co_occur) |>
+        dplyr::filter(weight > 10)
+    gr <- tidygraph::tbl_graph(edges = edges, nodes = nodes, node_key = 'name', directed = FALSE) |>
+        dplyr::mutate(degree = tidygraph::centrality_degree()) |>
+        dplyr::filter(!tidygraph::node_is_isolated()) |>
+        dplyr::mutate(community = )
+    return(gr)
+}
+
 

@@ -3,7 +3,6 @@
 #' @export
 
 get_TMDB <- function(path) {
-    print(path)
     try(
         httr::GET(
             url = httr::modify_url(

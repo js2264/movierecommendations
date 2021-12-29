@@ -18,9 +18,13 @@ filters <- function(
     )
 }
 
-getRecommendationNetwork <- function(gr = co_occurrencesGraph(co_occurrences(), tmdb()), query, filters = movierecommendations::filters()) {
+recommendationNetwork <- function(graph = movierecommendations::co_occurrences(), query = 'Oldboy (2003)', filters = movierecommendations::filters()) {
 
-    sub <- gr
+    if (is.null(graph)) {
+        return(NULL)
+    }
+
+    sub <- graph
 
     # Filter out hubs
     sub <- sub |>
@@ -38,19 +42,19 @@ getRecommendationNetwork <- function(gr = co_occurrencesGraph(co_occurrences(), 
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query})
 
     # Filter out movies that are far away from query
-    q <- which({sub |> activate(nodes) |> pull(name)} %in% query)
+    q <- which({sub |> tidygraph::activate(nodes) |> dplyr::pull(name)} %in% query)
     sub <- sub |>
         tidygraph::activate(nodes) |>
         dplyr::mutate(
-            dist = distances(
-                sub, v = q, to = seq_len(gorder(sub)), mode = "out", weights = NA, algorithm = "automatic"
+            dist = igraph::distances(
+                sub, v = q, to = seq_len(igraph::gorder(sub)), mode = "out", weights = NA, algorithm = "automatic"
             ) %>% apply(2, min)
         ) |>
         dplyr::filter(dist <= 1) |> 
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query})
     
     # Only keep edges anchored at a query
-    q <- which({sub |> activate(nodes) |> pull(name)} %in% query)
+    q <- which({sub |> tidygraph::activate(nodes) |> dplyr::pull(name)} %in% query)
     sub <- sub |>
         tidygraph::activate(edges) |> 
         dplyr::filter(from %in% q | to %in% q) |> 
@@ -60,7 +64,7 @@ getRecommendationNetwork <- function(gr = co_occurrencesGraph(co_occurrences(), 
     # Only keep edges with greatest co-occurrences
     sub <- sub |>
         tidygraph::activate(edges) |> 
-        dplyr::mutate(weight2 = weight / {as_tibble(activate(sub, nodes))$degree[as_tibble(activate(sub, edges))$from]}) |> 
+        dplyr::mutate(weight2 = weight / {tibble::as_tibble(tidygraph::activate(sub, nodes))$degree[tibble::as_tibble(tidygraph::activate(sub, edges))$from]}) |> 
         dplyr::arrange(desc(weight2)) |>
         # dplyr::filter(weight2 >= quantile(weight2, filters[['weight_trehshold']])) |> 
         dplyr::filter(weight2 >= sort(weight2, decreasing = TRUE)[filters[['weight_trehshold']]]) |> 
@@ -75,9 +79,12 @@ getRecommendationNetwork <- function(gr = co_occurrencesGraph(co_occurrences(), 
     return(sub)
 }
 
-addMovie <- function(sub, gr = co_occurrencesGraph(co_occurrences(), tmdb()), query, filters = movierecommendations::filters()) {
+addMovie <- function(sub = NULL, graph = movierecommendations::co_occurrences(), query, filters = movierecommendations::filters()) {
     
-    sub2 <- gr
+    if (is.null(query)) {
+        return(sub)
+    }
+    sub2 <- graph
 
     # Filter out hubs
     sub2 <- sub2 |>
@@ -95,19 +102,19 @@ addMovie <- function(sub, gr = co_occurrencesGraph(co_occurrences(), tmdb()), qu
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query})
 
     # Filter out movies that are far away from query
-    q <- which({sub2 |> activate(nodes) |> pull(name)} %in% query)
+    q <- which({sub2 |> tidygraph::activate(nodes) |> dplyr::pull(name)} %in% query)
     sub2 <- sub2 |>
         tidygraph::activate(nodes) |>
         dplyr::mutate(
-            dist = distances(
-                sub2, v = q, to = seq_len(gorder(sub2)), mode = "out", weights = NA, algorithm = "automatic"
+            dist = igraph::distances(
+                sub2, v = q, to = seq_len(igraph::gorder(sub2)), mode = "out", weights = NA, algorithm = "automatic"
             ) %>% apply(2, min)
         ) |>
         dplyr::filter(dist <= 1) |> 
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query})
     
     # Only keep edges anchored at a query
-    q <- which({sub2 |> activate(nodes) |> pull(name)} %in% query)
+    q <- which({sub2 |> tidygraph::activate(nodes) |> dplyr::pull(name)} %in% query)
     sub2 <- sub2 |>
         tidygraph::activate(edges) |> 
         dplyr::filter(from %in% q | to %in% q) |> 
@@ -117,7 +124,7 @@ addMovie <- function(sub, gr = co_occurrencesGraph(co_occurrences(), tmdb()), qu
     # Only keep edges with greatest co-occurrences
     sub2 <- sub2 |>
         tidygraph::activate(edges) |> 
-        dplyr::mutate(weight2 = weight / {as_tibble(activate(sub2, nodes))$degree[as_tibble(activate(sub2, edges))$from]}) |> 
+        dplyr::mutate(weight2 = weight / {tibble::as_tibble(tidygraph::activate(sub2, nodes))$degree[tibble::as_tibble(tidygraph::activate(sub2, edges))$from]}) |> 
         dplyr::arrange(desc(weight2)) |>
         # dplyr::filter(weight2 >= quantile(weight2, filters[['weight_trehshold']])) |> 
         dplyr::filter(weight2 >= sort(weight2, decreasing = TRUE)[filters[['weight_trehshold']]]) |> 
@@ -125,11 +132,17 @@ addMovie <- function(sub, gr = co_occurrencesGraph(co_occurrences(), tmdb()), qu
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query}) 
 
     # Join networks
-    joined_sub <- tidygraph::graph_join(
-        select(sub, -dist), select(sub2, -dist), 
-        by = c("name", "movieID", "original_title", "original_language", "release_date", "year", "runtime", "budget", "revenue", "vote_average", "popularity", "adult", "overview", "n_lists", "degree")
-    )
-    queries <- c(query, sub %>% as_tibble() %>% filter(isQuery) %>% pull(name))
+    if (is.null(sub)) {
+        joined_sub <- dplyr::select(sub2, -dist)
+        queries <- query
+    }
+    else {
+        joined_sub <- tidygraph::graph_join(
+            dplyr::select(sub, -dist), dplyr::select(sub2, -dist), 
+            by = c("name", "movieID", "original_title", "original_language", "release_date", "year", "runtime", "budget", "revenue", "vote_average", "popularity", "adult", "overview", "n_lists", "degree")
+        )
+        queries <- c(query, sub %>% tibble::as_tibble() %>% dplyr::filter(isQuery) %>% dplyr::pull(name))
+    }
     joined_sub <- joined_sub %>% 
         tidygraph::activate(nodes) |>
         dplyr::mutate(dist = 1) |>

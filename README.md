@@ -45,7 +45,7 @@ recommendationNetwork(
 ) |> showRecommendations()
 
 # Get recommendations for network of co-occurrences, for several movies
-net <- recommendationNetwork(query = 'Stoker (2013)')
+net <- recommendationNetwork(query = 'Stoker (2013)', filters(th_filter_lang = 'en'))
 net <- net |> addMovie(query = 'The Skin I Live In (2011)')
 net <- net |> addMovie(query = 'All About My Mother (1999)')
 net <- net |> addMovie(query = 'Mama (2013)')
@@ -58,3 +58,8 @@ showRecommendations(net)
 ```r
 movieExplorer()
 ```
+
+![](inst/extdata/network.png)
+
+![](inst/extdata/network_options.png)
+

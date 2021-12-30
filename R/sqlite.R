@@ -70,9 +70,9 @@ getRecommendations <- function(
     q <- lapply(seq_along(nodes), function(K) {
         node <- nodes[[K]]
         if (is.character(node)) {
-            titles <- searchTitle(node, tmdb)
+            titles <- searchField(node, tmdb)
             if (length(titles) != 1) {
-                stop("Title not found (or several titles found). Use movierecommendations::searchTitle() to get exact title.")
+                stop("Title not found (or several titles found). Use movierecommendations::searchField() to get exact title.")
             }
             node <- title2id(node, tmdb)
         }

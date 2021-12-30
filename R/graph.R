@@ -31,9 +31,9 @@ showRecommendations <- function(graph) {
     vis.edges$from <- vis.nodes$movieID[vis.edges$from]
     vis.edges$to <- vis.nodes$movieID[vis.edges$to]
     vis.edges$width <- scales::rescale(vis.edges$weight2, to = c(1, 15))
-    vis.edges$color <- "#383838"
-    vis.edges$smooth <- FALSE
-    vis.edges$shadow <- FALSE
+    vis.edges$color <- "#6e6e6e"
+    vis.edges$smooth <- TRUE
+    vis.edges$shadow <- TRUE
 
     # Graph
     vis <- visNetwork::visNetwork(vis.nodes, vis.edges, width = "100%", height = "90vh", background = '#e2e2e2') %>% 

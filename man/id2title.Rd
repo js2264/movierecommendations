@@ -4,7 +4,7 @@
 \alias{id2title}
 \title{id2title}
 \usage{
-id2title(ids, tmdb)
+id2title(ids, tmdb = tmdb())
 }
 \description{
 id2title

@@ -12,7 +12,7 @@ filters <- function(
         year = ifelse(!is.null(th_year_min) & !is.null(th_year_max), glue::glue('year >= {th_year_min} & year <= {th_year_max}'), 'TRUE'),
         runtime = ifelse(!is.null(th_runtime), glue::glue('runtime <= {th_runtime}'), 'TRUE'),
         budget = ifelse(!is.null(th_budget), glue::glue('budget <= {th_budget}'), 'TRUE'),
-        filter_lang = ifelse(!is.null(th_filter_lang), glue::glue('original_language == {th_filter_lang}'), 'TRUE'),
+        filter_lang = ifelse(!is.null(th_filter_lang), paste(glue::glue("original_language == '{th_filter_lang}'"), collapse = ' | '), 'TRUE'),
         filter_hubs = ifelse(!is.null(th_filter_hubs_nlists) & !is.null(th_filter_hubs_degree), glue::glue('n_lists <= {th_filter_hubs_nlists} & degree <= {th_filter_hubs_degree}'), 'TRUE'),
         weight_trehshold = n_recommendations
     )
@@ -67,9 +67,14 @@ recommendationNetwork <- function(graph = movierecommendations::co_occurrences()
         dplyr::mutate(weight2 = weight / {tibble::as_tibble(tidygraph::activate(sub, nodes))$degree[tibble::as_tibble(tidygraph::activate(sub, edges))$from]}) |> 
         dplyr::arrange(desc(weight2)) |>
         # dplyr::filter(weight2 >= quantile(weight2, filters[['weight_trehshold']])) |> 
-        dplyr::filter(weight2 >= sort(weight2, decreasing = TRUE)[filters[['weight_trehshold']]]) |> 
+        dplyr::filter(weight2 >= sort(weight2, decreasing = TRUE)[min(nrow(tidygraph::as_tibble(tidygraph::activate(sub, edges))), filters[['weight_trehshold']])]) |> 
         tidygraph::activate(nodes) |> 
         dplyr::filter(!tidygraph::node_is_isolated() | {name %in% query}) 
+
+    # Remove duplicate edges
+    sub <- sub %>% 
+        tidygraph::activate(edges) |>
+        dplyr::distinct()
 
     # Label queries
     sub <- sub %>% 
@@ -143,10 +148,18 @@ addMovie <- function(sub = NULL, graph = movierecommendations::co_occurrences(),
         )
         queries <- c(query, sub %>% tibble::as_tibble() %>% dplyr::filter(isQuery) %>% dplyr::pull(name))
     }
+
+    # Remove duplicate edges
+    joined_sub <- joined_sub %>% 
+        tidygraph::activate(edges) |>
+        dplyr::distinct()
+    
+    # Tidy up
     joined_sub <- joined_sub %>% 
         tidygraph::activate(nodes) |>
         dplyr::mutate(dist = 1) |>
         dplyr::mutate(isQuery = name %in% queries)
+
 
     return(joined_sub)
 }

@@ -4,7 +4,7 @@
 \alias{searchMovie}
 \title{searchMovie}
 \usage{
-searchMovie(pattern, tmdb)
+searchMovie(pattern, tmdb = tmdb(), field = "title")
 }
 \description{
 searchMovie

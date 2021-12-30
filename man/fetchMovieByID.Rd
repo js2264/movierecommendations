@@ -4,7 +4,7 @@
 \alias{fetchMovieByID}
 \title{fetchMovieByID}
 \usage{
-fetchMovieByID(x, tmdb)
+fetchMovieByID(x, tmdb = tmdb())
 }
 \description{
 fetchMovieByID

@@ -12,20 +12,20 @@ title2id <- function(titles, tmdb) {
 #' 
 #' @export
 
-id2title <- function(ids, tmdb) {
+id2title <- function(ids, tmdb = tmdb()) {
     tmdb[['movies']] |>
         dplyr::filter(movieID %in% ids) |>
         dplyr::pull(title)
 }
 
-#' searchTitle
+#' searchField
 #' 
 #' @export
 
-searchTitle <- function(pattern, tmdb, return_first = FALSE) {
-    titles <- tmdb[['movies']] |> dplyr::select(title) |> dplyr::pull(title)
+searchField <- function(pattern, tmdb = tmdb(), field = 'title', return_first = FALSE) {
+    entries <- tmdb[['movies']] |> dplyr::select(field) |> dplyr::pull(field)
     lapply(pattern, \(x) {
-        res <- agrep(x, titles, ignore.case = TRUE, value = TRUE)
+        res <- agrep(x, entries, ignore.case = TRUE, value = TRUE)
         res <- res[order(stringdist::stringdist(x, res))]
         if (return_first | res[1] == x) {
             res[1]
@@ -40,7 +40,7 @@ searchTitle <- function(pattern, tmdb, return_first = FALSE) {
 #' 
 #' @export
 
-fetchMovieByID <- function(x, tmdb) {
+fetchMovieByID <- function(x, tmdb = tmdb()) {
     dplyr::filter(tmdb[['movies']], movieID == x)
 }
 
@@ -48,8 +48,11 @@ fetchMovieByID <- function(x, tmdb) {
 #' 
 #' @export
 
-searchMovie <- function(pattern, tmdb) {
-    x <- searchTitle(pattern, tmdb, return_first = TRUE) %>% title2id(tmdb)
+searchMovie <- function(pattern, tmdb = tmdb(), field = 'title') {
+    x <- searchField(pattern, tmdb, field = field, return_first = TRUE)
+    x <- tmdb[['movies']] |>
+        dplyr::filter(eval(rlang::parse_expr(field)) == x) |>
+        dplyr::pull(movieID)
     dplyr::filter(tmdb[['movies']], movieID == x)
 }
 

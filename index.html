@@ -68,7 +68,7 @@
 <!-- badges: start -->
 
 <div class="section level2">
-<h2 id="get-recommendations-from-tmdb-lists">Get recommendations from TMDB lists<a class="anchor" aria-label="anchor" href="#get-recommendations-from-tmdb-lists"></a>
+<h2 id="get-recommendations-from-tmdb-lists-the-tedious-way">Get recommendations from TMDB lists (the tedious way)<a class="anchor" aria-label="anchor" href="#get-recommendations-from-tmdb-lists-the-tedious-way"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/js2264/movierecommendations" class="external-link">movierecommendations</a></span><span class="op">)</span>
@@ -77,19 +77,19 @@
 <span class="va">tmdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/tmdb.html">tmdb</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># Search a movie to query</span>
-<span class="fu">searchTitle</span><span class="op">(</span><span class="st">'The Aveangers'</span>, <span class="va">tmdb</span><span class="op">)</span>
+<span class="fu"><a href="reference/searchField.html">searchField</a></span><span class="op">(</span><span class="st">'The Aveangers'</span>, <span class="va">tmdb</span>, field <span class="op">=</span> <span class="st">'title'</span><span class="op">)</span>
 
 <span class="co"># Find frequently associated movies</span>
 <span class="fu"><a href="reference/getRecommendations.html">getRecommendations</a></span><span class="op">(</span><span class="st">'Friends with Benefits (2011)'</span>, <span class="va">tmdb</span><span class="op">)</span>
 <span class="fu"><a href="reference/getRecommendations.html">getRecommendations</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Friends with Benefits (2011)'</span>, <span class="st">'Love &amp; Other Drugs (2010)'</span><span class="op">)</span>, <span class="va">tmdb</span><span class="op">)</span>
-<span class="fu"><a href="reference/getRecommendations.html">getRecommendations</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Friends with Benefits (2011)'</span>, <span class="st">'Love &amp; Other Drugs (2010)'</span>, <span class="st">'Remember Me (2010)'</span><span class="op">)</span>, <span class="va">tmdb</span><span class="op">)</span>
-<span class="fu">dplyr</span><span class="fu">::</span><span class="fu">group_by</span><span class="op">(</span><span class="va">q</span>, <span class="va">to_title</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">tally</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">arrange</span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">desc</span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="reference/getRecommendations.html">getRecommendations</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Friends with Benefits (2011)'</span>, <span class="st">'Love &amp; Other Drugs (2010)'</span>, <span class="st">'Remember Me (2010)'</span><span class="op">)</span>, <span class="va">tmdb</span><span class="op">)</span> |&gt; 
+    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">group_by</span><span class="op">(</span><span class="va">to_title</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">tally</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">arrange</span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">desc</span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="get-recommendations-from-movie-co-occurrences-in-tmdb-lists">Get recommendations from movie co-occurrences in TMDB lists<a class="anchor" aria-label="anchor" href="#get-recommendations-from-movie-co-occurrences-in-tmdb-lists"></a>
+<h2 id="get-recommendations-from-movie-co-occurrences-in-tmdb-lists-the-manual-way">Get recommendations from movie co-occurrences in TMDB lists (the manual way)<a class="anchor" aria-label="anchor" href="#get-recommendations-from-movie-co-occurrences-in-tmdb-lists-the-manual-way"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Load TMDB co-occurrences table as a graph</span>
+<code class="sourceCode R"><span class="co"># Load TMDB co-occurrences network</span>
 <span class="va">co_occurrences</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/co_occurrences.html">co_occurrences</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># Get recommendations for network of co-occurrences</span>
@@ -104,11 +104,11 @@
 <span class="fu">recommendationNetwork</span><span class="op">(</span>
     <span class="va">co_occurrences</span>,
     query <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'The Others (2001)'</span>, <span class="st">'Stoker (2013)'</span>, <span class="st">'The Orphanage (2007)'</span>, <span class="st">'The Strangers (2008)'</span>, <span class="st">'The Grudge 2 (2006)'</span><span class="op">)</span>, 
-    filters <span class="op">=</span> <span class="fu">filters</span><span class="op">(</span>n_recommendations <span class="op">=</span> <span class="fl">10</span>, th_year_min <span class="op">=</span> <span class="fl">2000</span>, th_year_max <span class="op">=</span> <span class="fl">2020</span><span class="op">)</span>
+    filters <span class="op">=</span> <span class="fu">filters</span><span class="op">(</span>n_recommendations <span class="op">=</span> <span class="fl">20</span>, th_year_min <span class="op">=</span> <span class="fl">2000</span>, th_year_max <span class="op">=</span> <span class="fl">2020</span><span class="op">)</span>
 <span class="op">)</span> |&gt; <span class="fu">showRecommendations</span><span class="op">(</span><span class="op">)</span>
 
 <span class="co"># Get recommendations for network of co-occurrences, for several movies</span>
-<span class="va">net</span> <span class="op">&lt;-</span> <span class="fu">recommendationNetwork</span><span class="op">(</span>query <span class="op">=</span> <span class="st">'Stoker (2013)'</span>, <span class="fu">filters</span><span class="op">(</span>th_filter_lang <span class="op">=</span> <span class="st">'en'</span><span class="op">)</span><span class="op">)</span>
+<span class="va">net</span> <span class="op">&lt;-</span> <span class="fu">recommendationNetwork</span><span class="op">(</span>query <span class="op">=</span> <span class="st">'Stoker (2013)'</span><span class="op">)</span>
 <span class="va">net</span> <span class="op">&lt;-</span> <span class="va">net</span> |&gt; <span class="fu">addMovie</span><span class="op">(</span>query <span class="op">=</span> <span class="st">'The Skin I Live In (2011)'</span><span class="op">)</span>
 <span class="va">net</span> <span class="op">&lt;-</span> <span class="va">net</span> |&gt; <span class="fu">addMovie</span><span class="op">(</span>query <span class="op">=</span> <span class="st">'All About My Mother (1999)'</span><span class="op">)</span>
 <span class="va">net</span> <span class="op">&lt;-</span> <span class="va">net</span> |&gt; <span class="fu">addMovie</span><span class="op">(</span>query <span class="op">=</span> <span class="st">'Mama (2013)'</span><span class="op">)</span>
@@ -116,12 +116,13 @@
 <span class="fu">showRecommendations</span><span class="op">(</span><span class="va">net</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="open-up-a-shiny-app">Open up a shiny app<a class="anchor" aria-label="anchor" href="#open-up-a-shiny-app"></a>
+<h2 id="open-up-a-shiny-app-the-fun-way">Open up a shiny app (the FUN way)<a class="anchor" aria-label="anchor" href="#open-up-a-shiny-app-the-fun-way"></a>
 </h2>
+<p>A fully interactive movie explorer is available!</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">movieExplorer</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="inst/extdata/network.png"></p>
-<p><img src="inst/extdata/network_options.png"></p>
+<p><img src="https://github.com/js2264/movierecommendations/blob/master/inst/extdata/network.png"></p>
+<p><img src="https://github.com/js2264/movierecommendations/blob/master/inst/extdata/network_options.png"></p>
 </div>
 </div>
   </div>

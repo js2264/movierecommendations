@@ -165,3 +165,79 @@ co_occurrences <- dplyr::bind_rows(res) |>
     dplyr::filter(dplyr::select(., from, to) %>% duplicated() %>% `!`) %>% dplyr::select(-title_from, -title_to) %>%
     dplyr::relocate(co_occur, .after = to)
 
+######################################################
+######## GET LIST OF ALL MOVIES ON TMDB ##############
+######################################################
+
+#tmdb_movies 
+{
+    # Get all movie IDs
+    tmpfile <- tempfile()
+    download.file('http://files.tmdb.org/p/exports/movie_ids_01_01_2022.json.gz', 'movie_ids_01_01_2022.json.gz')
+    system("gunzip movie_ids_01_01_2022.json.gz")
+    lines <- readLines('movie_ids_01_01_2022.json')
+    ids <- lines |> 
+        stringr::str_replace(',\"original_title.*', '') |> 
+        stringr::str_replace('^.*id\":', '') |> 
+        as.numeric()
+    titles <- lines |> 
+        stringr::str_replace('^.*original_title\":\"', '') |> 
+        stringr::str_replace('\",\".*', '')
+    movies <- tibble::tibble(
+        original_title = titles, 
+        id = ids
+    ) %>% dplyr::arrange(id)
+
+    # Request for each movie
+    n_cores <- 10
+    future::plan(future::multisession, workers = n_cores)
+    progressr::with_progress({
+        p <- progressr::progressor(steps = nrow(movies))
+        requests <- glue::glue('movie/{movies$id}') %>% 
+            furrr::future_map(get_TMDB)
+    })
+    requests <- requests[lengths(requests) == 10]
+    saveRDS(requests, 'requests_movies.rds')
+
+    # Get all movie infos (without overview)
+    # tmdb_movies <- parallel::mclapply(mc.cores = 3, seq_along(requests), function(K) {
+    tmdb_movies <- lapply(seq_along(requests), function(K) {
+        print(K)
+        if (httr::status_code(requests[[K]]) == 200) {
+            # Sys.sleep(time=0.005)
+            x <- httr::content(requests[[K]])
+            x[sapply(x, is.null)] <- NA
+            tibble::as_tibble(x[c(
+                'id', 'title', 'original_title', 'original_language', 
+                'release_date', 'runtime', 'budget', 'revenue', 
+                'vote_average', 'popularity', 'adult'
+            )])
+        } 
+        else {
+            tibble::tibble(
+                'id' = K,
+                'title' = NA,
+                'original_title' = NA,
+                'original_language' = NA,
+                'release_date' = NA,
+                'runtime' = NA,
+                'budget' = NA,
+                'revenue' = NA,
+                'vote_average' = NA, 
+                'popularity' = NA,
+                'adult' = NA
+            )
+        }
+    })
+    tmdb_movies2 <- dplyr::bind_rows(tmdb_movies) %>% 
+        dplyr::mutate(
+            year = stringr::str_replace(release_date, '-.*', ''), 
+            unique_title = glue::glue("{title} ({year})")
+        ) %>% 
+        dplyr::relocate(year, .after = release_date) %>% 
+        dplyr::relocate(unique_title, .after = id) %>% 
+        tidyr::drop_na(original_title) %>% 
+        dplyr::distinct()
+    tmdb_movies$unique_title[duplicated(tmdb_movies$unique_title)] <- stringr::str_replace(tmdb_movies$unique_title[duplicated(tmdb_movies$unique_title)], '\\)$', 'b\\)')
+    saveRDS(tmdb_movies2, 'tmdb_movies.rds')
+}

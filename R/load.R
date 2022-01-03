@@ -1,4 +1,4 @@
-#' loadTMDB
+#' tmdb
 #' 
 #' @import magrittr
 #' @export
@@ -11,6 +11,17 @@ tmdb <- function() {
     db$lists$listID <- as.numeric(db$lists$listID)
     RSQLite::dbDisconnect(TMDB)
     return(db)
+}
+
+#' tmdb_movies
+#' 
+#' @import magrittr
+#' @export
+
+tmdb_movies <- function() {
+    pathtmdb_movies <- system.file("extdata", "tmdb_movies.rds", package = "movierecommendations")
+    tmdb_movies <- readRDS(pathtmdb_movies) 
+    return(tmdb_movies)
 }
 
 #' co_occurrences

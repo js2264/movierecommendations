@@ -14,7 +14,26 @@ get_TMDB <- function(path) {
                 )
             ), 
             httr::add_headers('content-type' = "application/json;charset=utf-8"), 
-            httr::timeout(3)
+            httr::timeout(1)
         )
     )
+}
+
+get_TMDB_recommendation <- function(movie_id, n_recommendations = 10) {
+    movie <- get_TMDB(glue::glue('movie/{movie_id}')) |>
+        httr::content() |> 
+        purrr::pluck('title')
+    path <- glue::glue('movie/{movie_id}/recommendations')
+    try({
+        req <- get_TMDB(path) 
+        movies <- httr::content(req) |> 
+            purrr::pluck('results') |> 
+            purrr::map_int(\(x) x$id)
+        names(movies) <- httr::content(req) |> 
+            purrr::pluck('results') |> 
+            purrr::map_chr(\(x) x$title)
+        movies <- movies[1:min(nrow(movies), n_recommendations)]
+        movies[movie] <- movie_id
+        return(movies)
+    })
 }

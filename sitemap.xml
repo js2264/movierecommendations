@@ -19,15 +19,6 @@
     <loc>/reference/co_occurrences.html</loc>
   </url>
   <url>
-    <loc>/reference/enrichRecommendation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fetchMovieByID.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getRecommendations.html</loc>
-  </url>
-  <url>
     <loc>/reference/get_TMDB.html</loc>
   </url>
   <url>
@@ -50,5 +41,8 @@
   </url>
   <url>
     <loc>/reference/tmdb.html</loc>
+  </url>
+  <url>
+    <loc>/reference/tmdb_movies.html</loc>
   </url>
 </urlset>
